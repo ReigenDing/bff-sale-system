@@ -82,7 +82,7 @@ func (market *Market) Get(playload string, reply *Vegetable) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("vegetable %s is not exists", playload)
+	return fmt.Errorf("vegetables %s is not exists", playload)
 }
 
 func (market *Market) GetAmount(playload string, reply *float32) error {

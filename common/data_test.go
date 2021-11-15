@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"os"
 	"sync"
 	"testing"
@@ -67,18 +68,22 @@ func TestGet(t *testing.T) {
 	market := NewMarket()
 	var reply Vegetable
 	t.Run("get vegetable by name", func(t *testing.T) {
-		test_case := []string{
-			"veg1",
-			"veg2",
-			"veg3",
+		test_case := []struct {
+			name string
+			want string
+		}{
+			{"veg1", "veg1"},
+			{"veg2", "veg2"},
+			{"veg3", "veg3"},
+			{"veg4", "vegetables veg4 is not exists"},
 		}
 		for _, v := range test_case {
-			err := market.Get(v, &reply)
-			if err != nil {
-				t.Errorf(err.Error())
+			err := market.Get(v.name, &reply)
+			if v.name == "veg4" && err.Error() != v.want {
+				t.Errorf("want '%s' but got '%s'", err, fmt.Errorf(v.want))
 			}
-			if reply.Name != v {
-				t.Errorf("want %s but got %s", v, reply.Name)
+			if v.name != "veg4" && v.name != reply.Name {
+				t.Errorf("want %s but got %s", v.name, reply.Name)
 			}
 		}
 	})

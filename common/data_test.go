@@ -62,3 +62,24 @@ func TestReadCsvFile(t *testing.T) {
 		}
 	})
 }
+
+func TestGet(t *testing.T) {
+	market := NewMarket()
+	var reply Vegetable
+	t.Run("get vegetable by name", func(t *testing.T) {
+		test_case := []string{
+			"veg1",
+			"veg2",
+			"veg3",
+		}
+		for _, v := range test_case {
+			err := market.Get(v, &reply)
+			if err != nil {
+				t.Errorf(err.Error())
+			}
+			if reply.Name != v {
+				t.Errorf("want %s but got %s", v, reply.Name)
+			}
+		}
+	})
+}

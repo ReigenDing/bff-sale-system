@@ -67,3 +67,30 @@ func readCsvFile(filePath string, m *sync.RWMutex) (vegetables []*Vegetable) {
 	}
 	return
 }
+
+func NewMarket() *Market {
+	var m sync.RWMutex
+	return &Market{
+		database: readCsvFile("data.csv", &m),
+	}
+}
+
+func (market *Market) Get(playload string, reply *Vegetable) error {
+	for _, v := range market.database {
+		if v.Name == playload {
+			*reply = *v
+			return nil
+		}
+	}
+	return fmt.Errorf("vegetable %s is not exists", playload)
+}
+
+func (market *Market) GetAmount(playload string, reply *float32) error {
+	for _, v := range market.database {
+		if v.Name == playload {
+			*reply = v.Amount
+			return nil
+		}
+	}
+	return fmt.Errorf("vegetables %s is not exists", playload)
+}

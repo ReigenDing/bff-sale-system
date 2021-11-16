@@ -88,3 +88,54 @@ func TestGet(t *testing.T) {
 		}
 	})
 }
+
+func TestGetAmount(t *testing.T) {
+	market := NewMarket()
+	var reply float32
+	t.Run("get vegetable amount by name", func(t *testing.T) {
+		test_case := []struct {
+			name string
+			want float32
+		}{
+			{"veg1", 19.0},
+			{"veg2", 90.2},
+			{"veg3", 9.8},
+			{"veg4", 0},
+		}
+		for _, v := range test_case {
+			err := market.GetAmount(v.name, &reply)
+			if err != nil && err.Error() != "vegetables veg4 is not exists" {
+				t.Errorf("want '%s' but got '%s'", "vegetables veg4 is not exists", err.Error())
+			} else if err == nil && v.want != reply {
+				t.Errorf("want '%f' but got '%f'", v.want, reply)
+			}
+
+		}
+	})
+}
+
+func TestGetPricePerKg(t *testing.T) {
+	market := NewMarket()
+	var reply float32
+	t.Run("get vegetable price per kg by name", func(t *testing.T) {
+		test_case := []struct {
+			name string
+			want float32
+		}{
+			{"veg1", 1.2},
+			{"veg2", 2.4},
+			{"veg3", 5.2},
+			{"veg4", 0},
+		}
+		for _, v := range test_case {
+			err := market.GetPricePerKg(v.name, &reply)
+			if err != nil && err.Error() != "vegetables veg4 is not exists" {
+				t.Errorf("want '%s' but got '%s'", "vegetables veg4 is not exists", err.Error())
+
+			} else if err == nil && v.want != reply {
+				t.Errorf("want '%f' but got '%f'", v.want, reply)
+
+			}
+		}
+	})
+}

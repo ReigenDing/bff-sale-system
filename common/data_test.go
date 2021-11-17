@@ -139,3 +139,20 @@ func TestGetPricePerKg(t *testing.T) {
 		}
 	})
 }
+
+func TestGetALL(t *testing.T) {
+	var reply []string
+	market := NewMarket()
+	t.Run("get all vegetables", func(t *testing.T) {
+		err := market.GetAll(&reply)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(reply) != 3 {
+
+			t.Fatalf("want 3 but got %d", len(reply))
+		}
+		fmt.Printf("reply => %v", reply)
+	})
+
+}

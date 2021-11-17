@@ -104,3 +104,11 @@ func (market *Market) GetPricePerKg(name string, reply *float32) error {
 	}
 	return fmt.Errorf("vegetables %s is not exists", name)
 }
+
+func (market *Market) GetAll(reply *[]string) error {
+	for _, v := range market.database {
+		*reply = append(*reply, v.Name)
+
+	}
+	return nil
+}

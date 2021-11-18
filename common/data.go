@@ -112,3 +112,44 @@ func (market *Market) GetAll(reply *[]string) error {
 	}
 	return nil
 }
+
+func (market *Market) Add(playload Vegetable, reply *Vegetable) error {
+	if ok := vegetableAreadyExists(playload.Name, market.database); ok {
+		return fmt.Errorf("vegetable with name %s already exists", playload.Name)
+	}
+	market.database = append(market.database, &playload)
+	newVegetableToCsv(&playload)
+	*reply = playload
+	return nil
+}
+
+func vegetableAreadyExists(vegName string, array []*Vegetable) bool {
+	for _, veg := range array {
+		if veg.Name == vegName {
+			return true
+		}
+	}
+	return false
+}
+
+func newVegetableToCsv(vegetable *Vegetable) {
+	f, err := os.OpenFile("data.csv", os.O_APPEND|os.O_RDWR, 0644)
+	if err != nil {
+		log.Fatal("unable to read input file", err)
+	}
+	defer f.Close()
+	reader := csv.NewReader(f)
+	records, _ := reader.ReadAll()
+	writer := csv.NewWriter(f)
+	if len(records) == 0 {
+		writer.Write([]string{"Name", "PricePerKg", "AvaiableAmountofkg"})
+
+	}
+	var row []string
+	row = append(row, vegetable.Name)
+	row = append(row, fmt.Sprintf("%f", vegetable.PricePerKg))
+	row = append(row, fmt.Sprintf("%f", vegetable.Amount))
+	writer.Write(row)
+	writer.Flush()
+
+}

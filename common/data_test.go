@@ -156,3 +156,19 @@ func TestGetALL(t *testing.T) {
 	})
 
 }
+
+func TestAdd(t *testing.T) {
+	market := NewMarket()
+	var reply Vegetable
+	t.Run("add new vegetable", func(t *testing.T) {
+		newVeg := Vegetable{
+			Name:       "veg4",
+			PricePerKg: 3.6,
+			Amount:     8.0,
+		}
+		err := market.Add(newVeg, &reply)
+		if err != nil {
+			t.Errorf("add new veg failed")
+		}
+	})
+}

@@ -172,3 +172,20 @@ func TestAdd(t *testing.T) {
 		}
 	})
 }
+
+func TestUpdateVegetable(t *testing.T) {
+	market := NewMarket()
+	var reply Vegetable
+	var m sync.RWMutex
+	t.Run("update exists vegetable property", func(t *testing.T) {
+		updateVeg := Vegetable{
+			Name:       "veg1",
+			PricePerKg: 666,
+			Amount:     90,
+		}
+		err := market.Update(updateVeg, &reply, &m)
+		if err != nil {
+			t.Errorf("update %s fialed", updateVeg.Name)
+		}
+	})
+}

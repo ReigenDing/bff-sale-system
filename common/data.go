@@ -114,7 +114,7 @@ func (market *Market) GetAll(reply *[]string) error {
 }
 
 func (market *Market) Add(playload Vegetable, reply *Vegetable) error {
-	if ok := vegetableAreadyExists(playload.Name, market.database); ok {
+	if ok, _ := vegetableAreadyExists(playload.Name, market.database); ok {
 		return fmt.Errorf("vegetable with name %s already exists", playload.Name)
 	}
 	market.database = append(market.database, &playload)
@@ -123,13 +123,13 @@ func (market *Market) Add(playload Vegetable, reply *Vegetable) error {
 	return nil
 }
 
-func vegetableAreadyExists(vegName string, array []*Vegetable) bool {
+func vegetableAreadyExists(vegName string, array []*Vegetable) (bool, *Vegetable) {
 	for _, veg := range array {
 		if veg.Name == vegName {
-			return true
+			return true, veg
 		}
 	}
-	return false
+	return false, nil
 }
 
 func newVegetableToCsv(vegetable *Vegetable) {
@@ -151,5 +151,23 @@ func newVegetableToCsv(vegetable *Vegetable) {
 	row = append(row, fmt.Sprintf("%f", vegetable.Amount))
 	writer.Write(row)
 	writer.Flush()
+
+}
+
+func (market *Market) Update(playload Vegetable, reply *Vegetable, m *sync.RWMutex) error {
+
+	exists, currentVeg := vegetableAreadyExists(playload.Name, market.database)
+	if !exists {
+		reply = nil
+		return fmt.Errorf("vegetable with name %s is not exists", playload.Name)
+	} else {
+		currentVeg.Name = playload.Name
+		currentVeg.Amount = playload.Amount
+		currentVeg.PricePerKg = playload.PricePerKg
+		res := writeCsvFile(market.database, m)
+		fmt.Printf("new veg database %v", res)
+		*reply = playload
+	}
+	return nil
 
 }

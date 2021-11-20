@@ -1,13 +1,14 @@
-package server
+package main
 
 import (
 	"github/ReigenDing/sales-system/common"
 	"io"
+	"log"
 	"net/http"
 	"net/rpc"
 )
 
-func start() error {
+func main() {
 	market := common.NewMarket()
 
 	rpc.Register(market)
@@ -20,7 +21,6 @@ func start() error {
 
 	err := http.ListenAndServe(":9000", nil)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
-	return nil
 }

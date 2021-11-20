@@ -144,7 +144,7 @@ func TestGetALL(t *testing.T) {
 	var reply []string
 	market := NewMarket()
 	t.Run("get all vegetables", func(t *testing.T) {
-		err := market.GetAll(&reply)
+		err := market.GetAll("", &reply)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -176,14 +176,14 @@ func TestAdd(t *testing.T) {
 func TestUpdateVegetable(t *testing.T) {
 	market := NewMarket()
 	var reply Vegetable
-	var m sync.RWMutex
+	// var m sync.RWMutex
 	t.Run("update exists vegetable property", func(t *testing.T) {
 		updateVeg := Vegetable{
 			Name:       "veg1",
 			PricePerKg: 666,
 			Amount:     90,
 		}
-		err := market.Update(updateVeg, &reply, &m)
+		err := market.Update(updateVeg, &reply)
 		if err != nil {
 			t.Errorf("update %s fialed", updateVeg.Name)
 		}

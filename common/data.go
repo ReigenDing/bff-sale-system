@@ -17,6 +17,7 @@ type Vegetable struct {
 }
 
 type Market struct {
+	m        *sync.RWMutex
 	database []*Vegetable
 }
 
@@ -57,13 +58,15 @@ func readCsvFile(filePath string, m *sync.RWMutex) (vegetables []*Vegetable) {
 
 	f, err := os.OpenFile(filePath, os.O_CREATE|os.O_RDONLY, 0644)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("===================")
+		log.Fatal("000000000000", err)
 	}
 	defer f.Close()
 
 	if err := gocsv.UnmarshalFile(f, &vegetables); err != nil {
-		log.Fatal(err)
-		return nil
+		fmt.Println("===================")
+		fmt.Println(err)
+		// return nil
 	}
 	return
 }
@@ -72,6 +75,7 @@ func NewMarket() *Market {
 	var m sync.RWMutex
 	return &Market{
 		database: readCsvFile("data.csv", &m),
+		m:        &m,
 	}
 }
 
@@ -105,7 +109,7 @@ func (market *Market) GetPricePerKg(name string, reply *float32) error {
 	return fmt.Errorf("vegetables %s is not exists", name)
 }
 
-func (market *Market) GetAll(reply *[]string) error {
+func (market *Market) GetAll(playload string, reply *[]string) error {
 	for _, v := range market.database {
 		*reply = append(*reply, v.Name)
 
@@ -140,6 +144,7 @@ func newVegetableToCsv(vegetable *Vegetable) {
 	defer f.Close()
 	reader := csv.NewReader(f)
 	records, _ := reader.ReadAll()
+	fmt.Printf("vegtable db => %v", records)
 	writer := csv.NewWriter(f)
 	if len(records) == 0 {
 		writer.Write([]string{"Name", "PricePerKg", "AvaiableAmountofkg"})
@@ -154,7 +159,7 @@ func newVegetableToCsv(vegetable *Vegetable) {
 
 }
 
-func (market *Market) Update(playload Vegetable, reply *Vegetable, m *sync.RWMutex) error {
+func (market *Market) Update(playload Vegetable, reply *Vegetable) error {
 
 	exists, currentVeg := vegetableAreadyExists(playload.Name, market.database)
 	if !exists {
@@ -164,8 +169,8 @@ func (market *Market) Update(playload Vegetable, reply *Vegetable, m *sync.RWMut
 		currentVeg.Name = playload.Name
 		currentVeg.Amount = playload.Amount
 		currentVeg.PricePerKg = playload.PricePerKg
-		res := writeCsvFile(market.database, m)
-		fmt.Printf("new veg database %v", res)
+		res := writeCsvFile(market.database, market.m)
+		fmt.Printf("new veg database %v\n", res)
 		*reply = playload
 	}
 	return nil

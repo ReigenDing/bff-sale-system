@@ -14,8 +14,8 @@ func main() {
 	var veg common.Vegetable
 	var vegs []string
 	// var vegName string
-	// var vegAvailableAmount float32
-	// var vegPricePerKg float32
+	var vegAvailableAmount float32
+	var vegPricePerKg float32
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
@@ -114,6 +114,22 @@ func main() {
 		}
 		fmt.Printf("vegs => %v", vegs)
 		fmt.Fprint(rw, vegs)
+	})
+
+	mux.HandleFunc("/vegetables/get/price", func(rw http.ResponseWriter, r *http.Request) {
+		if err := client.Call("Market.GetPricePerKg", r.FormValue("name"), &vegPricePerKg); err != nil {
+			fmt.Fprint(rw, err)
+			return
+		}
+		fmt.Fprintf(rw, "vegetable %s price is %f", r.FormValue("name"), vegPricePerKg)
+	})
+
+	mux.HandleFunc("/vegetables/get/amount", func(rw http.ResponseWriter, r *http.Request) {
+		if err := client.Call("Market.GetAmount", r.FormValue("name"), &vegAvailableAmount); err != nil {
+			fmt.Fprint(rw, err)
+			return
+		}
+		fmt.Fprintf(rw, "vegtable %s amount is %f", r.FormValue("name"), vegAvailableAmount)
 	})
 
 	http.ListenAndServe(":9001", mux)

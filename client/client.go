@@ -12,6 +12,7 @@ import (
 func main() {
 	client, _ := rpc.DialHTTP("tcp", "127.0.0.1:9000")
 	var veg common.Vegetable
+	var vegs []string
 	// var vegName string
 	// var vegAvailableAmount float32
 	// var vegPricePerKg float32
@@ -94,6 +95,25 @@ func main() {
 		fmt.Fprintf(rw, "vegetable price %f update\n", veg.PricePerKg)
 		fmt.Fprintf(rw, "vegetable amount %f update\n", veg.Amount)
 
+	})
+
+	mux.HandleFunc("/vegetables/get", func(rw http.ResponseWriter, r *http.Request) {
+		if err := client.Call("Market.Get", r.FormValue("name"), &veg); err != nil {
+			fmt.Fprint(rw, err)
+			return
+		}
+		fmt.Fprintf(rw, "vegtable %s found\n", veg.Name)
+		fmt.Fprintf(rw, "vegtable %s price is %f \n", veg.Name, veg.PricePerKg)
+		fmt.Fprintf(rw, "vegtable %s amount is %f \n", veg.Name, veg.Amount)
+	})
+
+	mux.HandleFunc("/vegetables/get/all", func(rw http.ResponseWriter, r *http.Request) {
+		if err := client.Call("Market.GetAll", "", &vegs); err != nil {
+			fmt.Fprint(rw, err)
+			return
+		}
+		fmt.Printf("vegs => %v", vegs)
+		fmt.Fprint(rw, vegs)
 	})
 
 	http.ListenAndServe(":9001", mux)
